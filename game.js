@@ -1,93 +1,93 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const dragItem = document.getElementById('drag1');
-  const dropArea = document.getElementById('drop-area');
-  const completionMessage = document.getElementById('completion-message');
+  const draggables = document.querySelectorAll('.draggable');
+  const dropzones = document.querySelectorAll('.grow-slot');
+  const completionButtons = document.getElementById('completion-buttons');
 
-  // **Unified Drag and Drop for Desktop and Mobile**
   let isDragging = false;
-  let touchStartX = 0;
-  let touchStartY = 0;
+  let draggedItem = null;
+  let touchOffsetX = 0;
+  let touchOffsetY = 0;
+  const correctIds = ['seed', 'water-can', 'sun'];
+  const placed = new Set();
 
-  // --- Common Event Handlers ---
-  const handleDragStart = (event) => {
-      isDragging = true;
-      event.dataTransfer.setData('text/plain', dragItem.id);
-      console.log('Drag start');
-  };
+  // Desktop drag events
+  draggables.forEach(drag => {
+    drag.addEventListener('dragstart', e => {
+      draggedItem = e.target;
+      e.dataTransfer.setData('text/plain', draggedItem.id);
+    });
+  });
 
-  const handleDragOver = (event) => {
-      event.preventDefault();
-  };
+  dropzones.forEach(zone => {
+    zone.addEventListener('dragover', e => e.preventDefault());
 
-  const handleDrop = (event) => {
-      event.preventDefault();
-      if (!isDragging) return; // Prevent accidental drops
-      isDragging = false;
-
-      const id = event.dataTransfer.getData('text/plain');
-      const draggedElement = document.getElementById(id);
-      dropArea.appendChild(draggedElement);
-      completionMessage.style.display = "block";
-      console.log('Drop');
-  };
-
-  const handleTouchStart = (event) => {
-      isDragging = true;
-      touchStartX = event.touches[0].clientX - dragItem.offsetLeft;
-      touchStartY = event.touches[0].clientY - dragItem.offsetTop;
-      console.log('Touch start');
-  };
-
-  const handleTouchMove = (event) => {
-      if (!isDragging) return;
-      event.preventDefault();
-
-      const touchX = event.touches[0].clientX;
-      const touchY = event.touches[0].clientY;
-
-      dragItem.style.left = (touchX - touchStartX) + 'px';
-      dragItem.style.top = (touchY - touchStartY) + 'px';
-      console.log('Touch move');
-  };
-
-  const handleTouchEnd = (event) => {
-      if (!isDragging) return;
-      isDragging = false;
-
-      const dropAreaRect = dropArea.getBoundingClientRect();
-      const dragItemRect = dragItem.getBoundingClientRect();
-
-      // Check if the center of the dragItem is within the dropArea
-      const dragItemCenterX = dragItemRect.left + (dragItemRect.width / 2);
-      const dragItemCenterY = dragItemRect.top + (dragItemRect.height / 2);
-
-      if (dragItemCenterX > dropAreaRect.left &&
-          dragItemCenterX < dropAreaRect.right &&
-          dragItemCenterY > dropAreaRect.top &&
-          dragItemCenterY < dropAreaRect.bottom) {
-
-          // Set the position of the dragItem to match the dropArea
-          dragItem.style.left = dropAreaRect.left + 'px';
-          dragItem.style.top = dropAreaRect.top + 'px';
-
-          completionMessage.style.display = "block";
-          console.log('Touch end - dropped in area');
-      } else {
-          // Reset position if not dropped in the correct area
-          dragItem.style.left = ''; // Clear inline styles
-          dragItem.style.top = '';  // Clear inline styles
-          console.log('Touch end - dropped outside area');
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData('text/plain');
+      const item = document.getElementById(id);
+      if (!zone.querySelector('.draggable')) {
+        zone.appendChild(item);
+        item.style.position = 'static';
+        placed.add(id);
+        checkCompletion();
       }
-  };
+    });
+  });
 
-  // --- Assign Event Listeners ---
-  // Desktop
-  dragItem.addEventListener('dragstart', handleDragStart);
-  dropArea.addEventListener('dragover', handleDragOver);
-  dropArea.addEventListener('drop', handleDrop);
+  // Mobile drag logic
+  draggables.forEach(drag => {
+    drag.addEventListener('touchstart', e => {
+      isDragging = true;
+      draggedItem = drag;
+      const touch = e.touches[0];
+      touchOffsetX = touch.clientX - draggedItem.getBoundingClientRect().left;
+      touchOffsetY = touch.clientY - draggedItem.getBoundingClientRect().top;
+      draggedItem.style.zIndex = 999;
+    });
 
-  // Mobile
-  dragItem.addEventListener('touchstart', handleTouchStart);
-  dragItem.addEventListener('touchmove', handleTouchMove, { passive: false });
-  dragItem.addEventListener('touchend', handleTouchEnd);
+    drag.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      draggedItem.style.left = (touch.clientX - touchOffsetX) + 'px';
+      draggedItem.style.top = (touch.clientY - touchOffsetY) + 'px';
+    }, { passive: false });
+
+    drag.addEventListener('touchend', e => {
+      if (!isDragging) return;
+      isDragging = false;
+
+      const dragRect = draggedItem.getBoundingClientRect();
+      for (const zone of dropzones) {
+        const zoneRect = zone.getBoundingClientRect();
+        const centerX = dragRect.left + dragRect.width / 2;
+        const centerY = dragRect.top + dragRect.height / 2;
+
+        if (
+          centerX > zoneRect.left &&
+          centerX < zoneRect.right &&
+          centerY > zoneRect.top &&
+          centerY < zoneRect.bottom &&
+          !zone.querySelector('.draggable')
+        ) {
+          zone.appendChild(draggedItem);
+          draggedItem.style.position = 'static';
+          placed.add(draggedItem.id);
+          checkCompletion();
+          return;
+        }
+      }
+
+      // Reset position if not placed
+      draggedItem.style.left = '';
+      draggedItem.style.top = '';
+    });
+  });
+
+  function checkCompletion() {
+    if (correctIds.every(id => placed.has(id))) {
+      document.getElementById('game-area').classList.add('complete');
+      completionButtons.style.display = 'block';
+    }
+  }
 });
