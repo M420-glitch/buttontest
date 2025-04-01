@@ -168,25 +168,24 @@ h1 {
   /* Landscape mode adjustments for mobile */
   @media (orientation: landscape) {
     #game-container {
-      flex-direction: row; /* Restore row layout */
-      align-items: flex-start;
-      max-height: 100vh; /* Limit height to screen */
+      /* Keep portrait layout */
+      flex-direction: column;
+      align-items: center;
     }
 
     #game-area {
-      width: 60%; /* Reduce game area width */
-      height: 70vh; /* Adjust height to fit screen */
-      max-height: 70vh; /* Ensure it doesn't exceed screen height */
-      overflow: auto; /* Enable scrolling if content overflows */
+      /* Use portrait dimensions */
+      width: 100%;
+      max-width: 600px;
+      height: auto;
     }
 
     #toolbox {
-      flex-direction: column; /* Stack toolbox items vertically */
-      border-top: none;
-      border-left: 2px solid #444;
-      min-width: 140px; /* Set a minimum width */
-      max-height: 70vh; /* Limit height to screen */
-      overflow-y: auto; /* Enable vertical scrolling if needed */
+      /* Use portrait toolbox layout */
+      flex-direction: row;
+      border-left: none;
+      border-top: 2px solid #444;
+      min-width: 100%;
     }
   }
 }
