@@ -191,6 +191,77 @@ h1 {
 }
 
 /* ✅ Mobile landscape view */
+@media (max-width: 1024px) and (orientation: landscape) {
+  body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #game-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 100%;
+    width: 100%;
+    gap: 0;
+  }
+
+  #toolbox {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 40%; /* Toolbox takes 40% of the width */
+    height: 100%; /* Full height */
+    border-right: 2px solid #444;
+    overflow: hidden;
+  }
+
+  #game-area {
+    width: 60%; /* Game area takes 60% of the width */
+    height: 100%; /* Full height */
+    max-height: 100%;
+    border: none;
+  }
+
+  h1, p, #top-left-controls, #xp-counter {
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  p {
+    font-size: 14px;
+  }
+
+  #top-left-controls {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .draggable {
+    width: 60px;
+    margin: 5px;
+  }
+
+  .draggable img {
+    width: 60px;
+  }
+}
+
+/* ✅ Mobile landscape view */
 @media (max-height: 500px) and (orientation: landscape) {
   body {
     display: flex;
