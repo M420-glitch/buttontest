@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // **Unified Drag and Drop for Desktop and Mobile**
   let isDragging = false;
+  let touchStartX = 0;
+  let touchStartY = 0;
 
   // --- Common Event Handlers ---
   const handleDragStart = (event) => {
@@ -31,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const handleTouchStart = (event) => {
       isDragging = true;
-      touchStartX = event.touches[0].clientX;
-      touchStartY = event.touches[0].clientY;
+      touchStartX = event.touches[0].clientX - dragItem.offsetLeft;
+      touchStartY = event.touches[0].clientY - dragItem.offsetTop;
       console.log('Touch start');
   };
 
@@ -45,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       dragItem.style.left = (touchX - touchStartX) + 'px';
       dragItem.style.top = (touchY - touchStartY) + 'px';
+      console.log('Touch move');
   };
 
   const handleTouchEnd = (event) => {
@@ -55,17 +58,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const dragItemRect = dragItem.getBoundingClientRect();
 
       if (dragItemRect.left > dropAreaRect.left &&
-          dragItemRect.right < dropAreaRect.right &&
+          dragItemRect.right > dropAreaRect.right &&
           dragItemRect.top > dropAreaRect.top &&
           dragItemRect.bottom > dropAreaRect.bottom) {
           dropArea.appendChild(dragItem);
           completionMessage.style.display = "block";
           dragItem.style.position = 'static'; // Reset positioning
+          dragItem.style.left = ''; // Clear inline styles
+          dragItem.style.top = '';  // Clear inline styles
           console.log('Touch end - dropped in area');
       } else {
           // Reset position if not dropped in the correct area
-          dragItem.style.left = '';
-          dragItem.style.top = '';
+          dragItem.style.left = ''; // Clear inline styles
+          dragItem.style.top = '';  // Clear inline styles
           console.log('Touch end - dropped outside area');
       }
   };
