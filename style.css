@@ -39,6 +39,7 @@ body {
   line-height: 80px;
   cursor: grab;
   margin: 20px auto;
+  position: absolute; /* Set initial position to absolute */
 }
 
 #completion-message {
