@@ -65,15 +65,15 @@ document.addEventListener('DOMContentLoaded', () => {
           dragItemCenterX < dropAreaRect.right &&
           dragItemCenterY > dropAreaRect.top &&
           dragItemCenterY < dropAreaRect.bottom) {
-          dropArea.appendChild(dragItem);
+
+          // Set the position of the dragItem to match the dropArea
+          dragItem.style.left = dropAreaRect.left + 'px';
+          dragItem.style.top = dropAreaRect.top + 'px';
+
           completionMessage.style.display = "block";
-          dragItem.style.position = 'static'; // Reset positioning
-          dragItem.style.left = ''; // Clear inline styles
-          dragItem.style.top = '';  // Clear inline styles
           console.log('Touch end - dropped in area');
       } else {
           // Reset position if not dropped in the correct area
-          dragItem.style.position = 'static'; // Reset positioning
           dragItem.style.left = ''; // Clear inline styles
           dragItem.style.top = '';  // Clear inline styles
           console.log('Touch end - dropped outside area');
